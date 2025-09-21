@@ -1,0 +1,11 @@
+# Conjunto inicial focado em OWASP Top 10 + Java
+rules:
+  - id: imported_rulesets
+    message: "Usando regras públicas OWASP Top 10 e Java"
+    languages: [generic]
+    severity: INFO
+    patterns:
+      - pattern: $X
+    metadata:
+      references: ["https://semgrep.dev/r"]
+# Use rulesets prontos na linha de comando: --config p/owasp-top-ten --config p/java

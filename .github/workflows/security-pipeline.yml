@@ -1,20 +1,64 @@
-name: CI/CD Security
+name: Security Pipeline
 
 on:
   push:
-    branches: [ "main", "feature/**" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
-  sast_semgrep:
-    name: SAST - Semgrep
+  sast:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Run Semgrep (OWASP Top 10 + Java)
-        id: semgrep
-        uses: returntocorp/semgrep-action@v1
+      - uses: actions/checkout@v3
+      - name: Run Semgrep
+        run: |
+          mkdir -p reports/semgrep
+          docker run --rm -v "$PWD:/src" returntocorp/semgrep semgrep \
+            --config p/owasp-top-ten --config p/java \
+            --sarif --output /src/reports/semgrep/semgrep.sarif --metrics=off
+          docker run --rm -v "$PWD:/src" returntocorp/semgrep semgrep \
+            --config p/owasp-top-ten --config p/java \
+            --json --json-output /src/reports/semgrep/semgrep.json --metrics=off
+      - uses: actions/upload-artifact@v3
         with:
+          name: semgrep-reports
+          path: reports/semgrep/
+
+  sca:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run OWASP Dependency-Check
+        run: |
+          mkdir -p reports/dependency-check
+          docker run --rm -v "$PWD:/src" -v "$PWD/data/dependency-check:/usr/share/dependency-check/data" \
+            owasp/dependency-check:latest \
+            --scan /src --format HTML --out /src/reports/dependency-check \
+            --suppression /src/config/dependency-check/suppressions.xml --disableOssIndex
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-report
+          path: reports/dependency-check/
+
+  dast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Start Juice Shop
+        run: docker compose up -d juice-shop
+      - name: Run OWASP ZAP Baseline
+        run: |
+          mkdir -p reports/zap
+          docker run --rm -v "$PWD/reports/zap:/zap/reports" ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py --autooff -t "http://juice-shop:3000" \
+            -r /zap/reports/zap-baseline.html -x /zap/reports/zap-report.xml -I
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-baseline-report
+          path: reports/zap/
+      - name: Shutdown Juice Shop
+        if: always()
+        run: docker compose down

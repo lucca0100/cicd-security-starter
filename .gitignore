@@ -1,0 +1,5 @@
+﻿# === Security caches / artifacts (não versionar) ===
+data/dependency-check/
+reports/**/*.zip
+reports-*.zip
+reports/zap/_write_test.txt

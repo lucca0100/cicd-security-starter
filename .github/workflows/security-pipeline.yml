@@ -1,75 +1,22 @@
-name: CI/CD Security
+- name: Upload Semgrep artifacts
+  if: always()
+  uses: actions/upload-artifact@v4
+  with:
+    name: semgrep-reports
+    path: semgrep.sarif
 
-on:
-  push:
-    branches: [ "main", "feature/**" ]
-  pull_request:
-    branches: [ "main" ]
+- name: Upload Dependency-Check report
+  if: always()
+  uses: actions/upload-artifact@v4
+  with:
+    name: dependency-check-report
+    path: reports/dependency-check
 
-jobs:
-  sast_semgrep:
-    name: SAST - Semgrep
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: returntocorp/semgrep-action@v1
-        with:
-          config: |
-            p/owasp-top-ten
-            p/java
-          generateSarif: true
-      - name: Save Semgrep artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: semgrep-reports
-          path: |
-            semgrep.sarif
-            .semgrep/
-        # Gate opcional: falhar se CRITICAL/HIGH (ajustar conforme necessidade)
-
-  sca_dependency_check:
-    name: SCA - OWASP Dependency-Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run Dependency-Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: "cicd-security-starter"
-          path: "."
-          format: "HTML"
-          out: "reports/dependency-check"
-          args: "--suppression config/dependency-check/suppressions.xml"
-      - name: Upload DC report
-        uses: actions/upload-artifact@v4
-        with:
-          name: dependency-check-report
-          path: reports/dependency-check
-
-  dast_zap:
-    name: DAST - OWASP ZAP Baseline
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.12.0
-        with:
-          target: ${{ secrets.ZAP_TARGET_URL }}
-          cmd_options: "-a"
-      - name: Upload ZAP reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-baseline-report
-          path: |
-            report_html.html
-            report_xml.xml
-
-  # Opcional: SonarQube (requer servidor/token)
-  # sonar:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: sonarsource/sonarqube-scan-action@v2.0.0
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+- name: Upload ZAP report
+  if: always()
+  uses: actions/upload-artifact@v4
+  with:
+    name: zap-baseline-report
+    path: |
+      report_html.html
+      report_xml.xml

@@ -1,22 +1,20 @@
-- name: Upload Semgrep artifacts
-  if: always()
-  uses: actions/upload-artifact@v4
-  with:
-    name: semgrep-reports
-    path: semgrep.sarif
+name: CI/CD Security
 
-- name: Upload Dependency-Check report
-  if: always()
-  uses: actions/upload-artifact@v4
-  with:
-    name: dependency-check-report
-    path: reports/dependency-check
+on:
+  push:
+    branches: [ "main", "feature/**" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
 
-- name: Upload ZAP report
-  if: always()
-  uses: actions/upload-artifact@v4
-  with:
-    name: zap-baseline-report
-    path: |
-      report_html.html
-      report_xml.xml
+jobs:
+  sast_semgrep:
+    name: SAST - Semgrep
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Semgrep (OWASP Top 10 + Java)
+        id: semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:

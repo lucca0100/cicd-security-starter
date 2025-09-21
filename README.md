@@ -1,15 +1,6 @@
-# CI/CD Security Starter (SAST + DAST + SCA)
 
-Repositório de referência para **integrar testes SAST, DAST e SCA** em pipelines (GitHub Actions) e executar localmente via scripts e Docker.
-Focado em **Java/Maven** mas adaptável a outras stacks.
 
-> ✅ Sem dependência de servidores externos obrigatórios  
-> ✅ Scripts locais e pipeline prontos  
-> ✅ Relatórios organizados em `reports/`
-
----
-
-## Como usar (resumo)
+## Como usar 
 
 1. **Pré-requisitos**: Docker, Docker Compose, Git, Java 17, Maven 3.9+, Python 3.10+ (opcional para zip dos relatórios).
 2. **Executar local** (gera relatórios em `reports/`):
@@ -26,20 +17,19 @@ Focado em **Java/Maven** mas adaptável a outras stacks.
    - Ajuste *secrets* conforme necessário (ex.: `SONAR_TOKEN`, `SNYK_TOKEN`, `ZAP_TARGET_URL` se quiser usar um alvo externo).
 4. **Entregáveis**: veja `docs/ENTREGAVEIS.md`.
 
----
+
 
 ## Estrutura
 
-```
+
 app/                         # App Java exemplo (Maven)
 config/                      # Configs dos scanners
 docs/                        # Modelos e documentação
 scripts/                     # Scripts para executar os scanners e consolidar relatórios
 .github/workflows/           # Pipeline de CI/CD
 docker-compose.yml           # Alvos de teste (Juice Shop) e SonarQube opcional
-```
 
----
+
 
 ## Ferramentas
 
@@ -47,9 +37,7 @@ docker-compose.yml           # Alvos de teste (Juice Shop) e SonarQube opcional
 - **DAST**: OWASP ZAP Baseline (Docker).  
 - **SCA**: OWASP Dependency-Check (local/CI) e Snyk opcional (se tiver token).
 
-Cada ferramenta coloca artefatos em `reports/<ferramenta>/...`.
-
----
+Cada ferramenta coloca artefatos em `reports/<ferramenta>/...`
 
 ## Política de bloqueio (exemplo)
 
@@ -57,7 +45,4 @@ Cada ferramenta coloca artefatos em `reports/<ferramenta>/...`.
 - **Médias** geram alerta, **baixas** apenas log.  
 Você pode ajustar os limiares em `scripts/*.sh` e nos *jobs* do workflow.
 
----
 
-## Licença
-MIT.

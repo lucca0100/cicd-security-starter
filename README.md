@@ -1,4 +1,9 @@
-
+## Equipe:
+**Vitor Santana - RM: 99586**
+**Lucca Alexandre - RM: 99700**
+**Victor Wittner - RM: 98667**
+**Matheus Haruo - RM: 97663**
+**João Saborido - RM 98184**
 
 ## Como usar 
 
@@ -12,7 +17,7 @@
    docker compose up -d juice-shop
    ./scripts/run_zap_baseline.sh http://localhost:3000
    docker compose down
-   ```
+   
 3. **Pipeline GitHub Actions**: faça fork/commit e habilite *Actions*.
    - Ajuste *secrets* conforme necessário (ex.: `SONAR_TOKEN`, `SNYK_TOKEN`, `ZAP_TARGET_URL` se quiser usar um alvo externo).
 4. **Entregáveis**: veja `docs/ENTREGAVEIS.md`.
@@ -41,8 +46,8 @@ Cada ferramenta coloca artefatos em `reports/<ferramenta>/...`
 
 ## Política de bloqueio (exemplo)
 
-- **Falhas críticas/alta** em SAST/SCA/DAST **bloqueiam** o *merge* (saída não-zero).  
-- **Médias** geram alerta, **baixas** apenas log.  
+**Falhas críticas/alta** em SAST/SCA/DAST **bloqueiam** o *merge* (saída não-zero).  
+**Médias** geram alerta, **baixas** apenas log.  
 Você pode ajustar os limiares em `scripts/*.sh` e nos *jobs* do workflow.
 
 
